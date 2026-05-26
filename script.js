@@ -1,44 +1,62 @@
+window.onload = displayTasks;
+
 function addTask() {
+    const input = document.getElementById("taskInput");
+    const taskText = input.value.trim();
 
-  const input = document.getElementById("taskInput");
+    if (taskText === "") return;
 
-  const taskText = input.value;
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-  if (taskText === "") {
+    tasks.push({
+        text: taskText,
+        completed: false
+    });
 
-    alert("Please enter a task");
+    localStorage.setItem("tasks", JSON.stringify(tasks));
 
-    return;
-  }
+    input.value = "";
 
-  const li = document.createElement("li");
-
-  li.innerHTML = `
-    <span onclick="toggleTask(this)">
-      ${taskText}
-    </span>
-
-    <button
-      class="delete-btn"
-      onclick="deleteTask(this)"
-    >
-      Delete
-    </button>
-  `;
-
-  document
-    .getElementById("taskList")
-    .appendChild(li);
-
-  input.value = "";
+    displayTasks();
 }
 
-function deleteTask(button) {
+function displayTasks() {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-  button.parentElement.remove();
+    let list = document.getElementById("taskList");
+    list.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+        let li = document.createElement("li");
+
+        li.innerHTML = `
+            <span onclick="toggleTask(${index})" class="${task.completed ? 'completed' : ''}">
+                ${task.text}
+            </span>
+
+            <button onclick="deleteTask(${index})">Delete</button>
+        `;
+
+        list.appendChild(li);
+    });
 }
 
-function toggleTask(task) {
+function deleteTask(index) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-  task.classList.toggle("completed");
+    tasks.splice(index, 1);
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    displayTasks();
+}
+
+function toggleTask(index) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    tasks[index].completed = !tasks[index].completed;
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    displayTasks();
 }

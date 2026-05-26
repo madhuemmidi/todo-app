@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>To-Do App</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="motivation-box">
+      You did great 😊
+    </div>
+
+    <h1>My To-Do List ✅</h1>
+
+    <div class="input-section">
+
+      <input
+        type="text"
+        id="taskInput"
+        placeholder="Enter a task"
+      >
+
+      <button id="addButton">
+        Add
+      </button>
+
+    </div>
+
+    <ul id="taskList"></ul>
+
+  </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB_Z8BuO22K_977oqb6vRlW00pmXXB2iOk",
+  authDomain: "to-do-app-57631.firebaseapp.com",
+  projectId: "to-do-app-57631",
+  storageBucket: "to-do-app-57631.firebasestorage.app",
+  messagingSenderId: "577387753530",
+  appId: "1:577387753530:web:c2365f8a9f8dc1ec798503",
+  measurementId: "G-SBW475304P"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const taskInput = document.getElementById("taskInput");
+const addButton = document.getElementById("addButton");
+const taskList = document.getElementById("taskList");
+
+async function loadTasks() {
+
+    taskList.innerHTML = "";
+
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+
+    querySnapshot.forEach((docItem) => {
+
+        const li = document.createElement("li");
+
+        li.textContent = docItem.data().text;
+
+        const deleteBtn = document.createElement("button");
+
+        deleteBtn.textContent = "Delete";
+
+        deleteBtn.onclick = async () => {
+
+            await deleteDoc(doc(db, "tasks", docItem.id));
+
+            loadTasks();
+        };
+
+        li.appendChild(deleteBtn);
+
+        taskList.appendChild(li);
+    });
+}
+
+addButton.addEventListener("click", async () => {
+
+    const task = taskInput.value;
+
+    if (task !== "") {
+
+        await addDoc(collection(db, "tasks"), {
+            text: task
+        });
+
+        taskInput.value = "";
+
+        loadTasks();
+    }
+});
+
+loadTasks();
+
+</script>
+
+</body>
+</html>
