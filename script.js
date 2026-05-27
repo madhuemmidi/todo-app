@@ -1,62 +1,100 @@
-window.onload = displayTasks;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-function addTask() {
-    const input = document.getElementById("taskInput");
-    const taskText = input.value.trim();
+import {
 
-    if (taskText === "") return;
+  getAuth,
 
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  createUserWithEmailAndPassword,
 
-    tasks.push({
-        text: taskText,
-        completed: false
-    });
+  signInWithEmailAndPassword,
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+  onAuthStateChanged
 
-    input.value = "";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    displayTasks();
-}
+// FIREBASE CONFIG
+const firebaseConfig = {
 
-function displayTasks() {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  apiKey: "AIzaSyDVyKQc9Jk3yWWQdnUtOXbZuBaQCenlfaM",
 
-    let list = document.getElementById("taskList");
-    list.innerHTML = "";
+  authDomain: "user-counter-767bd.firebaseapp.com",
 
-    tasks.forEach((task, index) => {
-        let li = document.createElement("li");
+  projectId: "user-counter-767bd",
 
-        li.innerHTML = `
-            <span onclick="toggleTask(${index})" class="${task.completed ? 'completed' : ''}">
-                ${task.text}
-            </span>
+  storageBucket: "user-counter-767bd.firebasestorage.app",
 
-            <button onclick="deleteTask(${index})">Delete</button>
-        `;
+  messagingSenderId: "322579326042",
 
-        list.appendChild(li);
-    });
-}
+  appId: "1:322579326042:web:988d21c172c257f10d2463"
+};
 
-function deleteTask(index) {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+// INITIALIZE
+const app = initializeApp(firebaseConfig);
 
-    tasks.splice(index, 1);
+const auth = getAuth(app);
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+// ELEMENTS
+const signupBtn = document.getElementById("signupBtn");
 
-    displayTasks();
-}
+const loginBtn = document.getElementById("loginBtn");
 
-function toggleTask(index) {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+const email = document.getElementById("email");
 
-    tasks[index].completed = !tasks[index].completed;
+const password = document.getElementById("password");
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+// SIGNUP
+signupBtn.addEventListener("click", async () => {
 
-    displayTasks();
-}
+  try {
+
+    await createUserWithEmailAndPassword(
+
+      auth,
+
+      email.value,
+
+      password.value
+    );
+
+    alert("Signup successful!");
+
+    window.location.href = "todo.html";
+
+  } catch (error) {
+
+    alert(error.message);
+  }
+});
+
+// LOGIN
+loginBtn.addEventListener("click", async () => {
+
+  try {
+
+    await signInWithEmailAndPassword(
+
+      auth,
+
+      email.value,
+
+      password.value
+    );
+
+    alert("Login successful!");
+
+    window.location.href = "todo.html";
+
+  } catch (error) {
+
+    alert(error.message);
+  }
+});
+
+// AUTO LOGIN
+onAuthStateChanged(auth, (user) => {
+
+  if (user) {
+
+    window.location.href = "todo.html";
+  }
+});
